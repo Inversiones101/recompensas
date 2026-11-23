@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programa de recompensas · Inversiones 101</title>
+<meta name="description" content="Cada mes premiamos con dinero a los miembros más activos de la comunidad de Inversiones 101. Conoce cómo funciona, las reglas y los últimos ganadores.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Inversiones 101 — dos terrenos: forest (marca) y paper (lectura). Acento: lime sobre forest, green sobre paper.
+   Layout: cabecera y hero sobre forest, resto sobre paper; panel de ganadores como tablero. */
+:root {
+  --font-display: "Inter Tight", Inter, system-ui, sans-serif;
+  --font-body: Inter, system-ui, sans-serif;
+  --paper: #F2F3EE; --card: #FBFBF8; --ink: #10201B; --muted: #5B6863;
+  --line: #DDE1DA; --line-strong: #7F8B85; --track: #E9ECE5;
+  --forest: #03302A; --forest-2: #0A3F35; --forest-line: rgba(162,226,26,.28);
+  --on-forest: #F2F3EE; --on-forest-muted: #A7BBB3;
+  --lime: #A2E21A; --lime-ink: #062A1F;
+  --green: #1F7A34; --green-soft: #E4F0DF;
+  --amber: #C47A06; --amber-soft: #F9EFD9; --amber-ink: #8F5C00;
+  --bar-other: #A9D57F; --bar-win-end: #7CC21E; --bar-blend-end: #F2B33D;
+  --radius: 22px; --radius-option: 16px; --radius-input: 12px; --radius-pill: 999px;
+  --content-max: 960px; --gutter: 16px;
+  --ease: cubic-bezier(.2,.7,.2,1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #071915; --card: #0E241F; --ink: #E8EEEA; --muted: #98ABA4;
+    --line: #1F3A33; --line-strong: #4E7F60; --track: #17302A;
+    --forest: #04372F; --forest-2: #0C4639;
+    --green: #8FD63C; --green-soft: #14321F;
+    --amber: #F0B04A; --amber-soft: #33260F; --amber-ink: #F0B04A;
+    --bar-other: #3F6E2C; --bar-win-end: #C4F05A; --bar-blend-end: #F7CB72;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #071915; --card: #0E241F; --ink: #E8EEEA; --muted: #98ABA4;
+  --line: #1F3A33; --line-strong: #4E7F60; --track: #17302A;
+  --forest: #04372F; --forest-2: #0C4639;
+  --green: #8FD63C; --green-soft: #14321F;
+  --amber: #F0B04A; --amber-soft: #33260F; --amber-ink: #F0B04A;
+  --bar-other: #3F6E2C; --bar-win-end: #C4F05A; --bar-blend-end: #F7CB72;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16.5px; line-height: 1.55; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+a { color: var(--green); }
+.wrap { width: 100%; max-width: var(--content-max); margin: 0 auto; padding: 0 var(--gutter); }
+
+/* Titulares */
+.h-display { font-family: var(--font-display); font-weight: 800; letter-spacing: -.035em; line-height: 1.05; text-wrap: balance; margin: 0; }
+.h1 { font-size: clamp(34px, 6.4vw, 56px); max-width: 17ch; }
+.h2 { font-size: clamp(26px, 4.2vw, 36px); max-width: 22ch; }
+.h3 { font-size: 22px; letter-spacing: -.03em; }
+.hl { color: var(--lime); }
+.hl-green { color: var(--green); }
+.eyebrow { font: 700 12.5px/1.3 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.on-forest .eyebrow { color: var(--on-forest-muted); }
+.lead { font-size: 18px; color: var(--muted); max-width: 56ch; margin: 14px 0 0; }
+.on-forest .lead { color: var(--on-forest-muted); }
+
+/* Foco */
+:where(a, button, summary, input):focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+.on-forest :where(a, button, summary):focus-visible { outline-color: var(--lime); }
+
+/* Botones */
+.btn { display: inline-flex; align-items: center; gap: 10px; border: 0; border-radius: var(--radius-pill); padding: 12px 22px; font: 700 16px/1.2 var(--font-body); text-decoration: none; cursor: pointer; transition: transform 150ms var(--ease), background-color 150ms var(--ease); }
+.btn:hover { transform: translateY(-1px); }
+.btn svg { width: 16px; height: 16px; flex: none; }
+.btn-go { background: var(--lime); color: var(--lime-ink); font: 800 17px/1.2 var(--font-display); letter-spacing: -.02em; padding: 8px 8px 8px 24px; gap: 14px; }
+.btn-go .go { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--lime-ink); color: var(--lime); }
+.btn-lime { background: var(--lime); color: var(--lime-ink); }
+.btn-outline-forest { background: transparent; color: var(--on-forest); box-shadow: inset 0 0 0 1.5px var(--on-forest-muted); }
+.btn-ghost { background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line-strong); }
+
+/* Tag / chip */
+.tag { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: var(--radius-pill); background: var(--forest-2); color: var(--lime); font: 700 13px/1.2 var(--font-body); }
+.tag svg { width: 14px; height: 14px; }
+.chip { display: inline-flex; align-items: center; padding: 5px 12px; border-radius: var(--radius-pill); font: 700 13px/1.2 var(--font-body); background: var(--green-soft); color: var(--green); white-space: nowrap; }
+.chip-blend { background: var(--amber-soft); color: var(--amber-ink); }
+.chip-neutral { background: var(--track); color: var(--ink); }
+
+/* Marca */
+.brand { display: inline-flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
+.brand-badge { position: relative; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--forest-2); color: var(--on-forest); font: 800 14px/1 var(--font-display); letter-spacing: -.03em; }
+.brand-badge::after { content: ""; position: absolute; top: -5px; right: -5px; width: 12px; height: 12px; border-radius: 50%; background: var(--lime); }
+.brand-name { display: block; font: 800 18px/1.05 var(--font-display); letter-spacing: -.035em; }
+.brand-sub { display: block; font: 500 13px/1.45 var(--font-body); color: var(--on-forest-muted); }
+
+/* Parte superior sobre forest, con círculos concéntricos */
+.on-forest { background: var(--forest); color: var(--on-forest); }
+.top { position: relative; overflow: hidden; }
+.top::before, .top::after { content: ""; position: absolute; border-radius: 50%; border: 1.5px solid var(--forest-line); pointer-events: none; top: 56%; transform: translateY(-50%); }
+.top::before { width: 760px; height: 760px; right: -380px; }
+.top::after { width: 440px; height: 440px; right: -220px; }
+.top > * { position: relative; z-index: 1; }
+.site-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0; flex-wrap: wrap; }
+.site-nav { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.site-nav a { color: var(--on-forest); text-decoration: none; font: 600 14.5px/1 var(--font-body); padding: 10px 12px; border-radius: var(--radius-pill); transition: background-color 150ms var(--ease); }
+.site-nav a:hover { background: var(--forest-2); }
+.hero { padding: 40px 0 64px; }
+.hero .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.hero .cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 30px; }
+
+/* Secciones */
+section.block { padding: 64px 0 0; }
+section.block:last-of-type { padding-bottom: 64px; }
+.section-head { margin-bottom: 28px; }
+
+/* Cómo funciona */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.step { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; display: grid; gap: 10px; align-content: start; }
+.step-n { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--forest); color: var(--on-forest); font: 800 16px/1 var(--font-display); }
+.step p { margin: 0; color: var(--muted); font-size: 15.5px; }
+.how-extra { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; margin-top: 16px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+.card h3 { margin: 0 0 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.prizes { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.prizes li { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line); font-weight: 600; }
+.prizes li:last-child { border-bottom: 0; padding-bottom: 0; }
+.prizes .amt { font: 800 24px/1 var(--font-display); letter-spacing: -.035em; }
+.prizes .first .amt { color: var(--green); }
+.small { font: 500 13px/1.45 var(--font-body); color: var(--muted); }
+.note { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; font: 400 15px/1.55 var(--font-body); }
+.note strong { color: var(--green); }
+
+/* Tablero de ganadores */
+.demo-banner { background: var(--amber-soft); color: var(--amber-ink); border-radius: var(--radius-option); padding: 12px 16px; font: 600 14px/1.45 var(--font-body); margin-bottom: 16px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+.stat-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 24px; display: grid; gap: 4px; }
+.stat-value { font: 800 34px/1.05 var(--font-display); letter-spacing: -.035em; }
+.stat-label { font: 500 13px/1.45 var(--font-body); color: var(--muted); }
+.board { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; align-items: start; }
+.board-main { display: grid; gap: 16px; min-width: 0; }
+.months { display: flex; flex-wrap: wrap; gap: 8px; }
+.month-btn { font: 700 14px/1.2 var(--font-body); padding: 9px 16px; border-radius: var(--radius-pill); border: 0; cursor: pointer; background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line-strong); transition: transform 150ms var(--ease); }
+.month-btn:hover { transform: translateY(-1px); }
+.month-btn[aria-pressed="true"] { background: var(--forest); color: var(--on-forest); box-shadow: none; }
+.winners { display: grid; gap: 12px; }
+.win { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-option); padding: 16px 20px; }
+.win-rank { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--green-soft); color: var(--green); font: 800 18px/1 var(--font-display); }
+.win-user { font: 800 19px/1.15 var(--font-display); letter-spacing: -.03em; overflow-wrap: anywhere; }
+.win-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
+.win-prize { font: 800 26px/1 var(--font-display); letter-spacing: -.035em; text-align: right; }
+.win.is-first { background: var(--forest); color: var(--on-forest); border-color: var(--forest); position: relative; overflow: hidden; }
+.win.is-first::after { content: ""; position: absolute; width: 300px; height: 300px; border-radius: 50%; border: 1.5px solid var(--forest-line); right: -150px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+.win.is-first > * { position: relative; z-index: 1; }
+.win.is-first .win-rank { background: var(--lime); color: var(--lime-ink); }
+.win.is-first .win-prize { color: var(--lime); }
+.win.is-first .chip { background: var(--forest-2); color: var(--lime); }
+.win.is-first .chip-blend { background: var(--amber-soft); color: var(--amber-ink); }
+.win.is-first .chip-neutral { background: var(--forest-2); color: var(--on-forest); }
+.empty { background: var(--card); border: 1px dashed var(--line-strong); border-radius: var(--radius); padding: 28px; color: var(--muted); }
+.bars { display: grid; gap: 14px; }
+.bar-row { display: grid; grid-template-columns: 5.5em 1fr 4.2em; align-items: center; gap: 12px; font: 600 14px/1.3 var(--font-body); }
+.bar-row .val { text-align: right; }
+.bar { height: 10px; border-radius: var(--radius-pill); background: var(--track); overflow: hidden; }
+.bar > i { display: block; height: 100%; border-radius: inherit; background: var(--bar-other); }
+.bar-row.is-latest .bar > i { background: linear-gradient(90deg, var(--green), var(--bar-win-end)); }
+
+/* Reglas */
+.rules { display: grid; gap: 16px; }
+.rule-group { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 24px; }
+.rule-group > h3 { margin: 16px 0 4px; font-size: 20px; }
+.rule-group > .eyebrow { margin: 18px 0 0; }
+details { border-bottom: 1px solid var(--line); }
+details:last-child { border-bottom: 0; }
+summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0; font: 700 16.5px/1.35 var(--font-body); }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: ""; flex: none; width: 10px; height: 10px; border-right: 2.5px solid var(--green); border-bottom: 2.5px solid var(--green); transform: rotate(45deg) translateY(-2px); transition: transform 150ms var(--ease); }
+details[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+details p { margin: 0 0 16px; color: var(--muted); max-width: 64ch; }
+details p strong { color: var(--ink); }
+
+/* Cobrar */
+.claim { position: relative; overflow: hidden; background: var(--forest); color: var(--on-forest); border-radius: var(--radius); padding: 36px; }
+.claim::before, .claim::after { content: ""; position: absolute; border-radius: 50%; border: 1.5px solid var(--forest-line); pointer-events: none; top: 50%; transform: translateY(-50%); }
+.claim::before { width: 520px; height: 520px; right: -260px; }
+.claim::after { width: 300px; height: 300px; right: -150px; }
+.claim > * { position: relative; z-index: 1; }
+.claim ol { margin: 22px 0 28px; padding: 0; list-style: none; display: grid; gap: 12px; max-width: 52ch; counter-reset: c; }
+.claim li { counter-increment: c; display: flex; gap: 14px; align-items: flex-start; }
+.claim li::before { content: counter(c); flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--on-forest-muted); font: 700 14px/1 var(--font-body); margin-top: 1px; }
+.claim .eyebrow { color: var(--on-forest-muted); }
+
+/* Pie */
+.site-foot { margin-top: 64px; padding: 36px 0 48px; }
+.site-foot .row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.site-foot .small { color: var(--on-forest-muted); max-width: 70ch; margin: 18px 0 0; }
+.site-foot a { color: var(--lime); }
+
+@media (max-width: 760px) {
+  .steps, .how-extra, .board, .stats { grid-template-columns: 1fr; }
+  .hero { padding: 24px 0 48px; }
+  .claim { padding: 28px 22px; }
+  .win { grid-template-columns: auto 1fr; }
+  .win-prize { grid-column: 1 / -1; text-align: left; }
+  .rule-group { padding: 4px 18px; }
+  .top::before { width: 520px; height: 520px; right: -300px; }
+  .top::after { width: 300px; height: 300px; right: -180px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; transform: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="top on-forest">
+  <div class="wrap">
+    <div class="site-head">
+      <a class="brand" href="#inicio" aria-label="Inversiones 101, programa de recompensas">
+        <span class="brand-badge" aria-hidden="true">101</span>
+        <span><span class="brand-name">Inversiones 101</span><span class="brand-sub">Programa de recompensas</span></span>
+      </a>
+      <nav class="site-nav" aria-label="Secciones">
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#ganadores">Ganadores</a>
+        <a href="#reglas">Reglas</a>
+        <a href="#cobrar">Cobrar premio</a>
+      </nav>
+    </div>
+    <div class="hero" id="inicio">
+      <div class="tags">
+        <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>4 ganadores al mes</span>
+        <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Hasta US$25 por mes</span>
+        <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Pago en dólares</span>
+      </div>
+      <p class="eyebrow">Programa de recompensas</p>
+      <h1 class="h-display h1">Participa en la comunidad y gana <span class="hl">dinero</span> cada mes</h1>
+      <p class="lead">Cada mes premiamos a los miembros que más aportan en la comunidad de Inversiones 101. Aquí ves cómo funciona, las reglas y quiénes han ganado.</p>
+      <div class="cta">
+        <a class="btn btn-go" href="https://www.skool.com/inversiones101" id="cta-skool">Únete en Skool <span class="go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+        <a class="btn btn-outline-forest" href="#reglas">Leer las reglas</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- CÓMO FUNCIONA -->
+  <section class="block" id="como-funciona">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Cómo funciona</p>
+        <h2 class="h-display h2">Tres pasos, <span class="hl-green">sin letra chica</span></h2>
+      </div>
+      <ol class="steps">
+        <li class="step"><span class="step-n">1</span><h3 class="h-display h3">Participa</h3><p>Publica, comenta, comparte aportes útiles, ayuda a otros miembros y entra a las llamadas de la comunidad.</p></li>
+        <li class="step"><span class="step-n">2</span><h3 class="h-display h3">Elegimos a 4 ganadores</h3><p>A inicio de cada mes revisamos la participación del mes anterior y anunciamos a los ganadores en la comunidad y en esta página.</p></li>
+        <li class="step"><span class="step-n">3</span><h3 class="h-display h3">Cobra en dólares</h3><p>Completas un formulario corto y te enviamos el pago desde la cuenta de la empresa en Estados Unidos.</p></li>
+      </ol>
+      <div class="how-extra">
+        <div class="card">
+          <h3 class="h-display h3">Qué cuenta como participar</h3>
+          <div class="chips">
+            <span class="chip">Publicaciones</span><span class="chip">Comentarios</span><span class="chip">Aportes útiles</span><span class="chip">Ayuda a otros miembros</span><span class="chip">Llamadas</span><span class="chip">Constancia</span>
+          </div>
+          <p class="small" style="margin:16px 0 0">Valoramos la calidad y la constancia más que la cantidad. El leaderboard de Skool es una referencia, no define al ganador: una sola publicación con muchos likes no alcanza.</p>
+        </div>
+        <div class="card">
+          <h3 class="h-display h3">Premios de cada mes</h3>
+          <ul class="prizes">
+            <li class="first"><span>1.er lugar</span><span class="amt">US$25</span></li>
+            <li><span>2.º lugar</span><span class="amt">US$5</span></li>
+            <li><span>3.er lugar</span><span class="amt">US$5</span></li>
+            <li><span>4.º lugar</span><span class="amt">US$5</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABLERO DE GANADORES -->
+  <section class="block" id="ganadores">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Tablero de ganadores</p>
+        <h2 class="h-display h2">Últimos <span class="hl-green">ganadores</span> y sus premios</h2>
+      </div>
+      <div class="demo-banner" id="demo-banner" hidden>Vista previa con datos de ejemplo. Reemplaza el bloque de ganadores al final de esta página con los datos reales antes de publicar.</div>
+      <div class="stats" id="stats" aria-label="Resumen del programa"></div>
+      <div class="board">
+        <div class="board-main">
+          <div class="months" id="months" role="group" aria-label="Elegir mes"></div>
+          <div class="winners" id="winners" aria-live="polite"></div>
+        </div>
+        <div class="card">
+          <h3 class="h-display h3">Premios por mes</h3>
+          <div class="bars" id="bars"></div>
+          <p class="small" style="margin:16px 0 0">Total en dólares de los premios anunciados cada mes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGLAS -->
+  <section class="block" id="reglas">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Reglas del programa</p>
+        <h2 class="h-display h2">Reglas claras para <span class="hl-green">todos</span></h2>
+        <p class="lead">Al participar en el programa aceptas estas reglas. Toca cada punto para leerlo completo.</p>
+      </div>
+      <div class="rules">
+
+        <div class="rule-group">
+          <p class="eyebrow">Participación</p>
+          <details open><summary>Quién puede participar</summary><p>Cualquier miembro de la comunidad de Inversiones 101 en Skool que sea mayor de edad en su país y cumpla las normas de la comunidad.</p></details>
+          <details><summary>No necesitas invertir ni comprar nada</summary><p>Participar y ganar no requiere invertir dinero ni comprar ningún producto o servicio financiero. Este programa no es una recomendación de inversión.</p></details>
+          <details><summary>Es un reconocimiento, no un trabajo</summary><p>Los premios son un reconocimiento voluntario a la participación. No crean una relación laboral, de contratación, de sociedad ni de representación con Inversiones 101, y nadie está obligado a publicar ni a participar.</p></details>
+        </div>
+
+        <div class="rule-group">
+          <p class="eyebrow">Cómo se eligen los ganadores</p>
+          <details><summary>Ciclo mensual y premios</summary><p>Cada mes elegimos hasta <strong>4 ganadores</strong>: el 1.er lugar recibe <strong>US$25</strong> y los lugares 2.º, 3.º y 4.º reciben <strong>US$5</strong> cada uno. Los anunciamos a inicio del mes siguiente, en la comunidad y en esta página.</p></details>
+          <details><summary>Qué cuenta como participación</summary><p>Publicaciones, comentarios, aportes útiles, ayuda a otros miembros, participación en las llamadas y cualquier otra actividad constructiva dentro de la comunidad. Valoramos la calidad y la constancia más que la cantidad.</p></details>
+          <details><summary>El leaderboard es una referencia</summary><p>Tomamos en cuenta el leaderboard de Skool, pero no es definitivo. Aparecer en él por una sola publicación con muchos likes no garantiza ser ganador. Revisamos la participación completa del mes.</p></details>
+          <details><summary>La decisión del equipo es final</summary><p>Elegimos a los ganadores de buena fe, con base en la participación del mes. La decisión es final.</p></details>
+          <details><summary>Qué conductas descalifican</summary><p>Spam, contenido copiado o generado en masa, cuentas múltiples, intercambio de likes o interacciones artificiales, promoción de terceros, información engañosa y cualquier incumplimiento de las normas de la comunidad. Podemos retirar un premio si descubrimos alguna de estas conductas.</p></details>
+        </div>
+
+        <div class="rule-group">
+          <p class="eyebrow">Pagos</p>
+          <details><summary>Pagamos en dólares, desde la empresa</summary><p>Los premios se pagan en <strong>dólares estadounidenses (USD)</strong>, por transferencia bancaria desde la cuenta de la empresa en Estados Unidos. No hacemos pagos en lempiras, ni desde cuentas personales, ni desde bancos en Honduras. La conversión a moneda local la hace tu banco.</p></details>
+          <details><summary>La cuenta debe estar a tu nombre</summary><p>Pagamos únicamente a una cuenta bancaria cuyo titular sea el ganador. No pagamos a cuentas de terceros.</p></details>
+          <details><summary>Cómo y cuándo cobrar</summary><p>Completa el formulario de cobro dentro de los <strong>30 días</strong> siguientes al anuncio. Sin el formulario completo no podemos pagar, y si no lo completas en ese plazo el premio vence.</p></details>
+          <details><summary>Plazo de pago</summary><p>Pagamos en lotes, dentro de los <strong>15 días hábiles</strong> siguientes a recibir tu formulario completo. Una vez enviado, el tiempo de llegada depende de los bancos y suele ser de 1 a 5 días hábiles.</p></details>
+          <details><summary>Comisiones bancarias</summary><p>Inversiones 101 cubre el costo de envío de su propio banco. Las comisiones del banco intermediario o del banco que recibe, y la conversión de moneda, pueden aplicar y corren por cuenta de quien recibe el pago.</p></details>
+          <details><summary>Puedes acumular premios</summary><p>Puedes acumular premios y cobrarlos juntos en un solo pago, lo que reduce las comisiones. Los premios acumulados deben cobrarse dentro de los <strong>12 meses</strong> siguientes a la fecha en que se ganaron.</p></details>
+          <details><summary>Premio alternativo</summary><p>Si lo prefieres, puedes elegir un premio alternativo (un acceso o beneficio dentro de Inversiones 101) en lugar del dinero. No tiene valor en efectivo y, una vez elegido, no se cambia.</p></details>
+          <details><summary>Tus datos bancarios son tu responsabilidad</summary><p>Revisa que tus datos bancarios estén correctos. Cuando enviamos el pago a los datos que nos diste, lo damos por cumplido. No nos hacemos responsables de transferencias hechas a datos incorrectos ni de demoras de los bancos.</p></details>
+        </div>
+
+        <div class="rule-group">
+          <p class="eyebrow">Condiciones del premio</p>
+          <details><summary>Los premios son intransferibles</summary><p>Los premios son personales. No se pueden transferir, vender, ceder ni compartir con otra persona, ni dentro ni fuera de la comunidad.</p></details>
+          <details><summary>Verificación de datos</summary><p>Podemos pedirte que confirmes tu identidad y que tu nombre coincida con el titular de la cuenta. Si los datos son falsos o inconsistentes, el premio se cancela.</p></details>
+          <details><summary>Impuestos</summary><p>Cada ganador es responsable de los impuestos que correspondan en su país. Inversiones 101 no retiene ni paga impuestos por ti y no da asesoría fiscal. Si la ley de Estados Unidos lo exige, podemos pedirte información fiscal adicional antes de pagar.</p></details>
+          <details><summary>Tus datos y tu nombre en esta página</summary><p>Usamos tus datos únicamente para procesar el pago y mantener el respaldo contable que exige la ley. No los vendemos. En esta página mostramos tu nombre de usuario de Skool y el premio; si prefieres no aparecer, avísanos antes del anuncio.</p></details>
+        </div>
+
+        <div class="rule-group">
+          <p class="eyebrow">Cambios y dudas</p>
+          <details><summary>Cambios al programa</summary><p>Podemos modificar, pausar o cerrar el programa cuando sea necesario, avisando en esta página. Los cambios no afectan a los premios ya anunciados.</p></details>
+          <details><summary>Dudas y reclamos</summary><p>Si tienes una duda o un reclamo sobre un premio, escríbenos dentro de los 15 días siguientes al anuncio, por mensaje en Skool<span data-contact-text hidden> o al correo <a data-contact-link href="#"></a></span>.</p></details>
+        </div>
+
+      </div>
+      <p class="small" style="margin-top:16px">Última actualización de las reglas: 23 de noviembre de 2026.</p>
+    </div>
+  </section>
+
+  <!-- COBRAR -->
+  <section class="block" id="cobrar">
+    <div class="wrap">
+      <div class="claim">
+        <p class="eyebrow">¿Ganaste?</p>
+        <h2 class="h-display h2">Cobra tu premio en <span class="hl">tres pasos</span></h2>
+        <ol>
+          <li>Entra al formulario de cobro dentro de los 30 días del anuncio.</li>
+          <li>Dinos si resides en Estados Unidos y completa los datos de tu cuenta, que debe estar a tu nombre. Si prefieres un premio alternativo, también lo eliges ahí.</li>
+          <li>Te pagamos en un máximo de 15 días hábiles y te avisamos por correo cuando salga el envío.</li>
+        </ol>
+        <a class="btn btn-go" id="claim-btn" href="#" hidden>Ir al formulario de cobro <span class="go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+        <p class="small" id="claim-note" style="color:var(--on-forest-muted);margin:0">Te enviamos el enlace del formulario junto con el anuncio de los ganadores.</p>
+      </div>
+      <div class="note" style="margin-top:16px"><strong>Importante:</strong> Inversiones 101 es educación financiera, no asesoría financiera personalizada. Este programa no te pide invertir ni comprar nada y ningún premio depende de tus decisiones de inversión.</div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot on-forest">
+  <div class="wrap">
+    <div class="row">
+      <a class="brand" href="#inicio"><span class="brand-badge" aria-hidden="true">101</span><span><span class="brand-name">Inversiones 101</span><span class="brand-sub">Educación en inversiones para Latinoamérica</span></span></a>
+      <a class="btn btn-lime" href="https://www.skool.com/inversiones101">Únete en Skool</a>
+    </div>
+    <p class="small">El programa de recompensas lo opera la empresa titular de Inversiones 101 y los premios se pagan desde su cuenta bancaria en Estados Unidos.</p>
+  </div>
+</footer>
+
+<!-- DATOS: edita solo este bloque cada mes. "estado" puede ser: pagado, en proceso, acumulado o alternativo.
+     Cuando pongas ganadores reales, borra "demo": true. -->
+<script type="application/json" id="ganadores-data">
+{
+  "demo": true,
+  "meses": [
+    { "mes": "2026-10", "ganadores": [
+      { "lugar": 1, "usuario": "usuario_ejemplo_1", "premio": 25, "estado": "pagado" },
+      { "lugar": 2, "usuario": "usuario_ejemplo_2", "premio": 5, "estado": "pagado" },
+      { "lugar": 3, "usuario": "usuario_ejemplo_3", "premio": 5, "estado": "acumulado" },
+      { "lugar": 4, "usuario": "usuario_ejemplo_4", "premio": 5, "estado": "alternativo" }
+    ]},
+    { "mes": "2026-11", "ganadores": [
+      { "lugar": 1, "usuario": "usuario_ejemplo_5", "premio": 25, "estado": "en proceso" },
+      { "lugar": 2, "usuario": "usuario_ejemplo_6", "premio": 5, "estado": "en proceso" },
+      { "lugar": 3, "usuario": "usuario_ejemplo_7", "premio": 5, "estado": "en proceso" },
+      { "lugar": 4, "usuario": "usuario_ejemplo_8", "premio": 5, "estado": "en proceso" }
+    ]}
+  ]
+}
+</script>
+
+<script>
+/* Configuración: completa estos dos datos cuando los tengas. Si quedan vacíos, la página los oculta. */
+var CONFIG = {
+  formUrl: "",       // enlace de tu formulario de Tally
+  contactEmail: ""   // correo de soporte del programa
+};
+
+(function () {
+  var MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  var ORD = { 1: "1.er lugar", 2: "2.º lugar", 3: "3.er lugar", 4: "4.º lugar" };
+  var ESTADO = { "pagado": "chip", "en proceso": "chip chip-blend", "acumulado": "chip chip-neutral", "alternativo": "chip chip-neutral" };
+  var ESTADO_TXT = { "pagado": "Pagado", "en proceso": "En proceso", "acumulado": "Acumulado", "alternativo": "Premio alternativo" };
+
+  var data;
+  try { data = JSON.parse(document.getElementById("ganadores-data").textContent); }
+  catch (e) { data = { meses: [] }; }
+
+  var meses = (data.meses || []).slice().sort(function (a, b) { return a.mes < b.mes ? 1 : -1; });
+  var selected = meses.length ? meses[0].mes : null;
+
+  function esc(s) { var d = document.createElement("div"); d.textContent = String(s); return d.innerHTML; }
+  function usd(n) { return "US$" + Number(n).toLocaleString("en-US"); }
+  function nombreMes(ym, corto) {
+    var p = ym.split("-"); var m = MESES[Number(p[1]) - 1] || "";
+    return corto ? m.slice(0, 3) + " " + p[0] : m.charAt(0).toUpperCase() + m.slice(1) + " " + p[0];
+  }
+  function totalMes(m) { return m.ganadores.reduce(function (s, g) { return s + g.premio; }, 0); }
+
+  function renderStats() {
+    var pagado = 0, n = 0;
+    meses.forEach(function (m) { m.ganadores.forEach(function (g) { n++; if (g.estado === "pagado") pagado += g.premio; }); });
+    document.getElementById("stats").innerHTML =
+      '<div class="stat-card"><span class="stat-value">' + usd(pagado) + '</span><span class="stat-label">Entregados en premios</span></div>' +
+      '<div class="stat-card"><span class="stat-value">' + n + '</span><span class="stat-label">Ganadores premiados</span></div>' +
+      '<div class="stat-card"><span class="stat-value">' + meses.length + '</span><span class="stat-label">' + (meses.length === 1 ? "Mes del programa" : "Meses del programa") + '</span></div>';
+  }
+
+  function renderMonths() {
+    var box = document.getElementById("months");
+    box.innerHTML = meses.map(function (m) {
+      return '<button type="button" class="month-btn" data-mes="' + esc(m.mes) + '" aria-pressed="' + (m.mes === selected) + '">' + esc(nombreMes(m.mes)) + '</button>';
+    }).join("");
+    box.querySelectorAll("button").forEach(function (b) {
+      b.addEventListener("click", function () { selected = b.getAttribute("data-mes"); renderMonths(); renderWinners(); });
+    });
+  }
+
+  function renderWinners() {
+    var box = document.getElementById("winners");
+    var m = meses.filter(function (x) { return x.mes === selected; })[0];
+    if (!m) { box.innerHTML = '<div class="empty">Los primeros ganadores se publicarán aquí en cuanto cerremos el primer mes.</div>'; return; }
+    box.innerHTML = m.ganadores.slice().sort(function (a, b) { return a.lugar - b.lugar; }).map(function (g) {
+      var cls = ESTADO[g.estado] || "chip chip-neutral";
+      var txt = ESTADO_TXT[g.estado] || g.estado;
+      return '<article class="win' + (g.lugar === 1 ? " is-first" : "") + '">' +
+        '<span class="win-rank" aria-hidden="true">' + esc(g.lugar) + '</span>' +
+        '<div><div class="win-user">' + esc(g.usuario) + '</div><div class="win-meta"><span class="chip chip-neutral">' + esc(ORD[g.lugar] || g.lugar + ".º lugar") + '</span><span class="' + cls + '">' + esc(txt) + '</span></div></div>' +
+        '<div class="win-prize">' + usd(g.premio) + '</div></article>';
+    }).join("");
+  }
+
+  function renderBars() {
+    var box = document.getElementById("bars");
+    if (!meses.length) { box.innerHTML = '<p class="small" style="margin:0">Aún no hay premios anunciados.</p>'; return; }
+    var max = Math.max.apply(null, meses.map(totalMes));
+    box.innerHTML = meses.map(function (m, i) {
+      var t = totalMes(m);
+      return '<div class="bar-row' + (i === 0 ? " is-latest" : "") + '"><span>' + esc(nombreMes(m.mes, true)) + '</span><span class="bar"><i style="width:' + Math.round((t / max) * 100) + '%"></i></span><span class="val">' + usd(t) + '</span></div>';
+    }).join("");
+  }
+
+  function applyConfig() {
+    if (CONFIG.formUrl) {
+      var b = document.getElementById("claim-btn"); b.href = CONFIG.formUrl; b.hidden = false;
+      document.getElementById("claim-note").hidden = true;
+    }
+    if (CONFIG.contactEmail) {
+      var t = document.querySelector("[data-contact-text]"); t.hidden = false;
+      var l = document.querySelector("[data-contact-link]"); l.href = "mailto:" + CONFIG.contactEmail; l.textContent = CONFIG.contactEmail;
+    }
+    if (data.demo) document.getElementById("demo-banner").hidden = false;
+  }
+
+  renderStats(); renderMonths(); renderWinners(); renderBars(); applyConfig();
+})();
+</script>
+</body>
+</html>
